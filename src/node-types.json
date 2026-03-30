@@ -1,5 +1,24 @@
 [
   {
+    "type": "args",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "typed_variable",
+          "named": true
+        },
+        {
+          "type": "untyped_variable",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "atomic",
     "named": true,
     "fields": {},
@@ -22,6 +41,16 @@
     "type": "block",
     "named": true,
     "fields": {
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "block_body",
+            "named": true
+          }
+        ]
+      },
       "label": {
         "multiple": false,
         "required": true,
@@ -32,15 +61,16 @@
           }
         ]
       }
-    },
+    }
+  },
+  {
+    "type": "block_body",
+    "named": true,
+    "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
-        {
-          "type": "insrtuction_cape",
-          "named": true
-        },
         {
           "type": "instruction_add",
           "named": true
@@ -59,6 +89,10 @@
         },
         {
           "type": "instruction_capa",
+          "named": true
+        },
+        {
+          "type": "instruction_cape",
           "named": true
         },
         {
@@ -189,31 +223,45 @@
     }
   },
   {
+    "type": "c_like_struct_body",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "typed_variable",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "enum_body",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "enum_variant",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "enum_initialization",
     "named": true,
     "fields": {
       "args": {
-        "multiple": true,
+        "multiple": false,
         "required": false,
         "types": [
           {
-            "type": "(",
-            "named": false
-          },
-          {
-            "type": ")",
-            "named": false
-          },
-          {
-            "type": ",",
-            "named": false
-          },
-          {
-            "type": "typed_variable",
-            "named": true
-          },
-          {
-            "type": "untyped_variable",
+            "type": "args",
             "named": true
           }
         ]
@@ -316,36 +364,6 @@
     }
   },
   {
-    "type": "insrtuction_cape",
-    "named": true,
-    "fields": {
-      "assign_to": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "typed_variable",
-            "named": true
-          },
-          {
-            "type": "untyped_variable",
-            "named": true
-          }
-        ]
-      }
-    },
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "enum_initialization",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "instruction_add",
     "named": true,
     "fields": {
@@ -434,11 +452,11 @@
     "named": true,
     "fields": {
       "body": {
-        "multiple": true,
-        "required": false,
+        "multiple": false,
+        "required": true,
         "types": [
           {
-            "type": "typed_variable",
+            "type": "c_like_struct_body",
             "named": true
           }
         ]
@@ -536,17 +554,47 @@
             "named": true
           }
         ]
+      },
+      "atomic": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "atomic",
+            "named": true
+          }
+        ]
       }
-    },
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "atomic",
-          "named": true
-        }
-      ]
+    }
+  },
+  {
+    "type": "instruction_cape",
+    "named": true,
+    "fields": {
+      "assign_to": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "typed_variable",
+            "named": true
+          },
+          {
+            "type": "untyped_variable",
+            "named": true
+          }
+        ]
+      },
+      "init_enum": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "enum_initialization",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -596,17 +644,17 @@
             "named": true
           }
         ]
+      },
+      "init": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "structure_initialization",
+            "named": true
+          }
+        ]
       }
-    },
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "structure_initialization",
-          "named": true
-        }
-      ]
     }
   },
   {
@@ -756,20 +804,12 @@
     "named": true,
     "fields": {
       "body": {
-        "multiple": true,
+        "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "enum_variant",
+            "type": "enum_body",
             "named": true
-          },
-          {
-            "type": "{",
-            "named": false
-          },
-          {
-            "type": "}",
-            "named": false
           }
         ]
       },
@@ -1289,6 +1329,16 @@
     "type": "instruction_match",
     "named": true,
     "fields": {
+      "cases": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "match_case",
+            "named": true
+          }
+        ]
+      },
       "default": {
         "multiple": false,
         "required": true,
@@ -1313,24 +1363,6 @@
           }
         ]
       }
-    },
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "typed_variable",
-          "named": true
-        },
-        {
-          "type": "untyped_variable",
-          "named": true
-        }
-      ]
     }
   },
   {
@@ -1685,23 +1717,11 @@
         ]
       },
       "types": {
-        "multiple": true,
+        "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "(",
-            "named": false
-          },
-          {
-            "type": ")",
-            "named": false
-          },
-          {
-            "type": ",",
-            "named": false
-          },
-          {
-            "type": "type",
+            "type": "tuple_like_struct_types",
             "named": true
           }
         ]
@@ -1786,6 +1806,32 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "match_case",
+    "named": true,
+    "fields": {
+      "init_enum": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "enum_initialization",
+            "named": true
+          }
+        ]
+      },
+      "label": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "block_label",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -1878,27 +1924,11 @@
     "named": true,
     "fields": {
       "args": {
-        "multiple": true,
+        "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "(",
-            "named": false
-          },
-          {
-            "type": ")",
-            "named": false
-          },
-          {
-            "type": ",",
-            "named": false
-          },
-          {
-            "type": "typed_variable",
-            "named": true
-          },
-          {
-            "type": "untyped_variable",
+            "type": "args",
             "named": true
           }
         ]
@@ -1913,6 +1943,21 @@
           }
         ]
       }
+    }
+  },
+  {
+    "type": "tuple_like_struct_types",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "type",
+          "named": true
+        }
+      ]
     }
   },
   {

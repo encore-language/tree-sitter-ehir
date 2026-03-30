@@ -38,17 +38,19 @@ module.exports = grammar({
         field("public", optional($.visibility_modifier)),
         field("name", $.identifier),
         field("generics", optional($.generic_params)),
-        "{",
-        field("body", repeat($.typed_variable)),
-        "}",
+        field("body", $.c_like_struct_body),
       ),
+    c_like_struct_body: ($) => seq("{", repeat($.typed_variable), "}"),
+
     instruction_tuple_like_struct: ($) =>
       seq(
         field("public", optional($.visibility_modifier)),
         field("name", $.identifier),
         field("generics", optional($.generic_params)),
-        field("types", seq("(", commaSep($.type), ")")),
+        field("types", $.tuple_like_struct_types),
       ),
+    tuple_like_struct_types: ($) => seq("(", commaSep($.type), ")"),
+
     instruction_unit_like_struct: ($) =>
       seq(
         field("public", optional($.visibility_modifier)),
@@ -61,8 +63,9 @@ module.exports = grammar({
         "enum",
         field("name", $.identifier),
         field("generics", optional($.generic_params)),
-        field("body", seq("{", repeat($.enum_variant), "}")),
+        field("body", $.enum_body),
       ),
+    enum_body: ($) => seq("{", repeat($.enum_variant), "}"),
 
     instruction_fn: ($) =>
       seq(
@@ -102,8 +105,9 @@ module.exports = grammar({
         field("generic_args", optional(seq("[", commaSep($.type), "]"))),
       ),
     block: ($) =>
-      seq(field("label", $.block_label), ":", repeat($._instruction)),
+      seq(field("label", $.block_label), ":", field("body", $.block_body)),
     block_label: ($) => seq("$", field("name", $.identifier)),
+    block_body: ($) => repeat1($._instruction),
     param: ($) => seq(field("name", $.identifier), ":", field("type", $.type)),
     comment: ($) => /;.*/,
     _instruction: ($) =>
@@ -133,7 +137,7 @@ module.exports = grammar({
 
         $.instruction_capa,
         $.instruction_caps,
-        $.insrtuction_cape,
+        $.instruction_cape,
         $.instruction_capsh,
         $.instruction_capeh,
         $.instruction_store,
@@ -200,10 +204,12 @@ module.exports = grammar({
       ),
     instruction_not: ($) => seq($._assignable, "not", $._any_variable),
 
-    instruction_capa: ($) => seq($._assignable, "capa", $.atomic),
+    instruction_capa: ($) =>
+      seq($._assignable, "capa", field("atomic", $.atomic)),
     instruction_caps: ($) =>
-      seq($._assignable, "caps", $.structure_initialization),
-    insrtuction_cape: ($) => seq($._assignable, "cape", $.enum_initialization),
+      seq($._assignable, "caps", field("init", $.structure_initialization)),
+    instruction_cape: ($) =>
+      seq($._assignable, "cape", field("init_enum", $.enum_initialization)),
     instruction_capsh: ($) => seq($._assignable, "capsh", $.identifier),
     instruction_capeh: ($) => seq($._assignable, "capeh", $.identifier),
     instruction_store: ($) =>
@@ -240,17 +246,14 @@ module.exports = grammar({
         ",",
         field("default", $.identifier),
         "{",
-        repeat(
-          seq(
-            $.identifier,
-            "(",
-            repeat($._any_variable),
-            ")",
-            "=>",
-            $.identifier,
-          ),
-        ),
+        field("cases", repeat($.match_case)),
         "}",
+      ),
+    match_case: ($) =>
+      seq(
+        field("init_enum", $.enum_initialization),
+        "=>",
+        field("label", $.block_label),
       ),
 
     _assignable: ($) => seq(field("assign_to", $._any_variable), "="),
@@ -270,18 +273,16 @@ module.exports = grammar({
     generic_params: ($) => seq("[", commaSep($.identifier), "]"),
     func_body: ($) => seq("{", repeat($.block), "}"),
     structure_initialization: ($) =>
-      seq(
-        field("type", $.type),
-        field("args", seq("(", commaSep($._any_variable), ")")),
-      ),
+      seq(field("type", $.type), field("args", $.args)),
     enum_initialization: ($) =>
       seq(
         field("name", $.identifier),
         field("generic_args", optional(seq("[", commaSep($.type), "]"))),
         "::",
         field("variant", $.identifier),
-        field("args", optional(seq("(", commaSep($._any_variable), ")"))),
+        field("args", optional($.args)),
       ),
+    args: ($) => seq("(", commaSep($._any_variable), ")"),
     enum_variant: ($) =>
       choice(
         $.instruction_c_like_struct,
